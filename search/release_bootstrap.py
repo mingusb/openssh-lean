@@ -65,7 +65,11 @@ def _download(url, path, length, digest=None):
     pending = path.with_name(path.name+'.part')
     for attempt in range(5):
         position = pending.stat().st_size if pending.exists() else 0
-        if position > length:
+        if position == length and (digest is None or sha(pending) == digest):
+            os.replace(pending, path)
+            return path
+        if position >= length and (position > length or
+                                   digest is None or sha(pending) != digest):
             pending.unlink()
             position = 0
         headers = {'User-Agent': USER_AGENT, 'Accept': 'application/octet-stream'}
