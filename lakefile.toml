@@ -1,0 +1,10 @@
+name = "openssh_lean"
+version = "0.1.0"
+defaultTargets = ["OpenSSH", "conformance"]
+
+[[lean_lib]]
+name = "OpenSSH"
+
+[[lean_exe]]
+name = "conformance"
+root = "Main"

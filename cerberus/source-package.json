@@ -1,0 +1,12 @@
+{
+  "cerberus": {
+    "base_commit": "c4284b08f80c4461f97d179896868106e510327e",
+    "changed_files": 378,
+    "changed_files_manifest": "cerberus/changed-files.txt",
+    "patch": "cerberus/patch.patch",
+    "patch_sha256": "2d45bac885554baf8e4341ffed85662407481bb41ef6ba85bd6267eabe87b34a",
+    "patched_tree": "5d17b442f841a32a2d9f1b8ee9ff43cdbaca5f0d",
+    "upstream_url": "https://github.com/OathTech/cerberus-lean.git"
+  },
+  "schema": 1
+}

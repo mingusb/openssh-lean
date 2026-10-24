@@ -1,0 +1,35 @@
+name: Source checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install debugger for portable tests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gdb
+      - name: Fetch pinned Cerberus base
+        run: |
+          git init --quiet local/cerberus-lean
+          git -C local/cerberus-lean fetch --quiet --depth=1 https://github.com/OathTech/cerberus-lean.git c4284b08f80c4461f97d179896868106e510327e
+      - name: Verify source package
+        run: python3 cerberus/verify.py
+      - name: Check Python source
+        run: |
+          python3 -m compileall -q search tests cerberus pipeline
+          python3 search/build_signal_search.py --help >/dev/null
+          python3 pipeline/build_models.py stage
+          python3 pipeline/export_release.py --help >/dev/null
+          python3 pipeline/host/check_host_dispatch.py --help >/dev/null
+          python3 pipeline/linked_source_binding.py --help >/dev/null
+          python3 pipeline/export_target_inventory.py --help >/dev/null
+          python3 pipeline/bind_export_targets.py --help >/dev/null
+          python3 pipeline/bind_census_units.py --help >/dev/null
+          python3 pipeline/combine_source_exports.py --help >/dev/null
+          python3 pipeline/export_all_target_core.py --help >/dev/null
+          python3 pipeline/freeze_models.py --help >/dev/null
+      - name: Run portable search tests
+        run: PYTHONPATH=search:tests python3 -m unittest -q test_autonomous_search_loop test_native_input_search test_native_signal_replay

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "target": "scp",
+  "argv": ["-r", "-t", "{destination}"],
+  "env": {"LC_ALL": "C", "PATH": "/usr/bin:/bin"},
+  "expect_signal": "SIGSEGV",
+  "prefix_base64": "",
+  "record_base64": "RDA3MDAgMCB4Cg==",
+  "suffix_base64": "",
+  "initial_depth": 1,
+  "growth_factor": 2,
+  "confirmation_runs": 3,
+  "timeout_seconds": 15,
+  "core_link": {
+    "section": "funs",
+    "ordinal": 32142,
+    "address": null,
+    "site_kind": "indirect-call",
+    "core_site_sha256": "5b849417d044322bcac7180deb17649d6572bfa881e2fef3415d323ccd1c2aca",
+    "source_file": "scp.c",
+    "source_line": 1865,
+    "source_sha256": "2bdd019495f36361345801a8ee61c2ea16db9e4d35e368b3d50557a8f875562b",
+    "relation": "causal_recursive_call",
+    "recursive_symbol": "sink",
+    "min_recursive_frames": 16
+  }
+}

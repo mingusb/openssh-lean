@@ -1,0 +1,23 @@
+name = "SignalSearch"
+defaultTargets = ["SignalSearch", "signal-search", "snapshot-builder"]
+packagesDir = "../cerberus-lean/lean_frontend/.lake/packages"
+moreLeanArgs = ["-DautoImplicit=false"]
+
+[[require]]
+name = "CerberusLean"
+path = "../cerberus-lean/lean_frontend"
+
+[[lean_lib]]
+name = "SignalSearch"
+
+[[lean_exe]]
+name = "signal-search"
+root = "Main"
+supportInterpreter = true
+moreLinkArgs = ["../cerberus-lean/lean_frontend/native/md5.o", "../cerberus-lean/lean_frontend/native/memo_runtime.o"]
+
+[[lean_exe]]
+name = "snapshot-builder"
+root = "SnapshotBuilder"
+supportInterpreter = true
+moreLinkArgs = ["../cerberus-lean/lean_frontend/native/md5.o", "../cerberus-lean/lean_frontend/native/memo_runtime.o"]
