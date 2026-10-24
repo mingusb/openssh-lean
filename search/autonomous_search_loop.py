@@ -22,6 +22,7 @@ from native_frontier_catalog import (ingest_fatal_outcomes,
 from seed_entry_campaign import SeedEntryCampaign, DEFAULT as DEFAULT_CAMPAIGN
 from native_entry_seeds import DEFAULT_STORE as DEFAULT_SEEDS
 from signal_catalog import DEFAULT as DEFAULT_CATALOG
+from release_bootstrap import ensure_ready
 
 
 DEFAULT = WORKSPACE/'local/search/jobs/autonomous-loop'
@@ -519,6 +520,7 @@ def main():
     if args.command == 'status':
         print(packed(read_status(args.directory)),flush=True)
         return
+    ensure_ready()
     with AutonomousSearchLoop(
             args.directory,frontier_dir=args.frontier,catalog_dir=args.catalog,
             seed_dir=args.seeds,campaign_dir=args.campaign,

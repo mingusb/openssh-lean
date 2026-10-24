@@ -15,7 +15,7 @@ import signal
 import sqlite3
 import zlib
 
-from common import WORKSPACE, need, sha
+from common import WORKSPACE, installed_path, need, sha
 from model_archive import Archive
 from native_fatal_reproducer import render_native_fatal_script
 from native_reproducer import input_identity
@@ -82,9 +82,10 @@ def derive_seed(record, profile, result, archive):
     native = record['native']
     binary = native['binary']
     pinned = binding['native_target']
+    installed_binary = str(installed_path(pinned['path']))
     need(binding['target'] == target and
-         binary == {'path': pinned['path'], 'sha256': pinned['sha256']} and
-         result['native_binary'] == pinned['path'] and
+         binary == {'path': installed_binary, 'sha256': pinned['sha256']} and
+         result['native_binary'] == installed_binary and
          result['native_binary_sha256'] == pinned['sha256'],
          'Native binary differs from archived translation input')
     need(Path(binary['path']).is_file() and
@@ -245,15 +246,16 @@ def derive_generic_seed(record, replay, archive):
     model = archive.model(target)
     binding = archive.read_json(model['binding_sha256'])
     pinned = binding['native_target']
+    installed_binary = str(installed_path(pinned['path']))
     need(record['archive'] == dict(
             manifest_sha256=archive.manifest_sha256,
             model_artifact_sha256=model['artifact_sha256']) and
          binding['target'] == target and
          binding['openssh_commit'] == archive.data['openssh_commit'] and
-         record['binary'] == {'path':pinned['path'],
+         record['binary'] == {'path':installed_binary,
                               'sha256':pinned['sha256']} and
-         Path(pinned['path']).is_file() and
-         sha(Path(pinned['path'])) == pinned['sha256'],
+         Path(installed_binary).is_file() and
+         sha(Path(installed_binary)) == pinned['sha256'],
          'Generic native fatal differs from archived binary/model/source')
     stdin = verified_asset_bytes(record,'stdin')
     script = verified_asset_bytes(record,'script')

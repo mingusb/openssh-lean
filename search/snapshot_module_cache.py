@@ -84,7 +84,12 @@ class SnapshotModuleCache:
         builder = build['snapshot_builder']
         lean_executable = WORKSPACE/'work/lean-4.32.2-linux/bin/lean'
         toolchain = WORKSPACE/'work/toolchain-lock.json'
-        pinned = json.loads(toolchain.read_bytes())['files'][str(lean_executable)]['sha256']
+        files = json.loads(toolchain.read_bytes())['files']
+        matches = [row['sha256'] for path, row in files.items()
+                   if path == str(lean_executable) or
+                   path.endswith('/work/lean-4.32.2-linux/bin/lean')]
+        need(len(matches) == 1, 'Pinned Lean executable is missing from the toolchain lock')
+        pinned = matches[0]
         need(sha(lean_executable) == pinned, 'Pinned Lean executable changed')
         return dict(module_format=FORMAT,
                     archive_manifest_sha256=index.archive.manifest_sha256,

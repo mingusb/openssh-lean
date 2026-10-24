@@ -19,7 +19,7 @@ import tempfile
 import time
 import uuid
 
-from common import WORKSPACE, need, sha
+from common import WORKSPACE, installed_path, need, sha
 from elf_instruction_site import decode_elf_instruction
 from model_archive import Archive
 from signal_catalog import Catalog, DEFAULT as DEFAULT_CATALOG
@@ -102,9 +102,9 @@ def native_binary(archive, target):
     need(binding['target'] == target and binding['openssh_commit'] == archive.data['openssh_commit'],
          'Archived target binding differs from the model')
     pinned = binding['native_target']
-    path = Path(pinned['path'])
+    path = installed_path(pinned['path'])
     source_root = WORKSPACE/'work/reference-source'
-    need(path.is_absolute() and not path.is_symlink() and path.resolve().parent == source_root.resolve(),
+    need(path.is_absolute() and not path.is_symlink() and path.parent.resolve() == source_root.resolve(),
          'Archived native target is outside the pinned C build')
     need(path.is_file() and os.access(path, os.X_OK), 'Pinned native target is unavailable')
     need(sha(path) == pinned['sha256'], 'Native binary differs from archived translation input')

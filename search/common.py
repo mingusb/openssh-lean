@@ -30,6 +30,26 @@ def sha(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
+def installed_path(original):
+    """Map a release producer's absolute path to this checked-out workspace."""
+    original = Path(original)
+    marker = WORKSPACE/'local/release/turnkey.json'
+    if not marker.is_file():
+        need(original.is_file(), 'Pinned runtime path is missing: '+str(original))
+        return original
+    release = json.loads(marker.read_bytes())
+    producer = Path(release['original_workspace'])
+    need(original.is_absolute() and original.is_relative_to(producer),
+         'Pinned runtime path is outside the release producer workspace')
+    relative = original.relative_to(producer)
+    need(relative.parts[:2] in (('local', 'runtime'), ('work', 'reference-source')) or
+         relative.parts[:1] == ('work',),
+         'Pinned runtime path is outside the released runtime')
+    current = WORKSPACE/relative
+    need(current.is_file(), 'Released runtime file is missing: '+str(relative))
+    return current
+
+
 def save(path, data):
     path = Path(path)
     temporary = path.with_name(path.name + '.tmp-' + uuid.uuid4().hex)

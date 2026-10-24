@@ -14,7 +14,7 @@ import re
 import sqlite3
 import time
 
-from common import WORKSPACE, need, sha
+from common import WORKSPACE, installed_path, need, sha
 from core_index import Index
 from native_entry_seeds import SeedStore, DEFAULT_STORE, record_sha256
 from search_job import Job
@@ -93,14 +93,15 @@ def seed_query(index, seed_id, seed, hypothesis):
              'Native seed and archived source binding differ')
     binding = index.archive.read_json(model['binding_sha256'])
     pinned = binding['native_target']
+    binary_path = str(installed_path(pinned['path']))
     need(seed['native_binary'] ==
-         {'path':pinned['path'],'sha256':pinned['sha256']},
+         {'path':binary_path,'sha256':pinned['sha256']},
          'Native seed is not bound to the archived C binary')
     args = seed['invocation']['argv']
     need(type(args) is list, 'Native seed has no argument list')
     # execve receives the executable path as argv[0]. Cerberus's
     # prepare_main_args consumes the complete argv list.
-    argv = [pinned['path'], *args]
+    argv = [binary_path, *args]
     alias = 'Pinned.' + re.sub(r'[^A-Za-z0-9_]', '_', target)
     need(re.fullmatch(r'Pinned\.[A-Za-z_][A-Za-z0-9_]*', alias) is not None,
          'Native target has no valid Lean alias')

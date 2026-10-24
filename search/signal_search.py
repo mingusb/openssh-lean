@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import tempfile
 
-from common import WORKSPACE, RUNTIME, need, sha
+from common import WORKSPACE, RUNTIME, installed_path, need, sha
 from core_index import Index
 
 
@@ -24,7 +24,8 @@ def checked_build():
     executable = BUILD/'.lake/build/bin/signal-search'
     need(sha(executable) == receipt['executable_sha256'], 'Search executable changed')
     for path, digest in receipt['import_artifacts'].items():
-        need(sha(Path(path)) == digest, 'Search semantic dependency changed: '+path)
+        need(sha(installed_path(path)) == digest,
+             'Search semantic dependency changed: '+path)
     builder = receipt.get('snapshot_builder')
     need(type(builder) is dict and
          builder.get('source_sha256') == receipt['files'].get('SnapshotBuilder.lean') and
@@ -33,7 +34,7 @@ def checked_build():
          bool(builder['import_artifacts']),
          'Snapshot builder differs from the checked build')
     for path, digest in builder['import_artifacts'].items():
-        need(sha(Path(path)) == digest,
+        need(sha(installed_path(path)) == digest,
              'Snapshot-builder semantic dependency changed: '+path)
     return executable, receipt
 
